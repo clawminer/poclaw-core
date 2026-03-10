@@ -1,0 +1,90 @@
+# ===== SECRETS (NEVER COMMIT) =====
+secret_logic.py
+encrypt_tool.py
+generate_challenge.py
+*.env
+.env
+*.key
+*.pem
+
+# ===== LOCAL WORKSPACE (not part of synium-core repo) =====
+# Old/dev versions
+ast_core.py
+ast_core_tee.py
+ast_core_v2.py
+app.py
+app_loader.py
+app_v2.py
+pow_logic.py
+tee_app.py
+run_tee.py
+
+# Likwid / DeFi scripts (unrelated)
+check_all_events.py
+check_final_reserves.py
+check_reserves.py
+check_txs.py
+check_vault_state.py
+daily_token_audit.py
+deploy_settler.py
+deploy_token.py
+direct_vault_test.py
+direct_vault_test_v2.py
+execute_lending.py
+execute_swap.py
+final_*.py
+find_pool.py
+finish_kickstart*.py
+get_pool_id*.py
+identify_router.py
+inject_liquidity.py
+kickstart_v2.py
+large_*.py
+likwid_*.py
+list_gemini_models.py
+prepare_models*.py
+quick_check.py
+register_mainnet.py
+right_swap_test.py
+setup_fresh_pool.py
+skill_gep_miner.py
+temp_gen_task.py
+test_*.py
+tweet_check.py
+ultimate_logic_gen.py
+verify_solution.py
+internal_audit.py
+interactive_*.py
+generate_n486.py
+server_mock.py
+encrypt_payload.py
+pow.env
+
+# Misc workspace files
+memory/
+BOOTSTRAP.md
+HEARTBEAT.md
+SOUL.md
+TOOLS.md
+USER.md
+IDENTITY.md
+AGENTS.md
+MEMORY.md
+
+# Contracts (keep only SyniumToken)
+contracts/deploy_info.json
+contracts/AgentBoundERC20.sol
+contracts/GMTMiningBank.sol
+contracts/GMTZKTLSBank.sol
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node / build artifacts
+node_modules/
+dist/
+build/

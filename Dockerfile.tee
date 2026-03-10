@@ -1,0 +1,55 @@
+# Dockerfile.tee — SYN PoW Server (EigenCompute TEE Edition)
+#
+# What's PUBLIC in this image:
+#   - pow_server_tee.py   (API + TEE loader)
+#   - ast_core_v3.py      (operation registry)
+#   - secret_logic.enc    (encrypted challenge logic — safe to ship)
+#   - requirements.tee.txt
+#
+# What's SECRET (NEVER baked into the image):
+#   - secret_logic.py     (plaintext logic — keep offline)
+#   - CORE_DECRYPTION_KEY (injected by EigenCloud KMS at boot)
+#   - POW_SECRET          (injected by KMS)
+#   - POW_TEE_SEED        (32-byte hex seed → TEE wallet derived in memory, injected by KMS)
+#
+# TEE Wallet flow:
+#   KMS injects POW_TEE_SEED → TEE derives ETH keypair in memory (never on disk)
+#   GET /health returns tee_wallet (public address only)
+#   Deploy SyniumToken with verifier = tee_wallet address from /health
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system deps
+RUN apt-get update && apt-get install -y --no-install-recommends gcc && rm -rf /var/lib/apt/lists/*
+
+# Install Python deps
+COPY requirements.tee.txt .
+RUN pip install --no-cache-dir -r requirements.tee.txt
+
+# Copy PUBLIC files only
+COPY ast_core_v3.py          .
+COPY pow_server_tee.py       .
+COPY secret_logic.enc        .
+
+# Never copy: secret_logic.py, .env, private keys
+
+EXPOSE 8001
+
+# KMS environment variables (set in EigenCloud console, NOT here):
+#   CORE_DECRYPTION_KEY = <Fernet key from encrypt_tool.py>
+#   POW_SECRET          = <openssl rand -hex 32>
+#   POW_TEE_SEED        = <openssl rand -hex 32>  ← 32-byte hex, TEE wallet derived at boot
+#   POW_CONTRACT_ADDRESS= <SYNToken contract address>  ← fill after deploy_token_tee.py
+#   POW_CHAIN_ID        = 1
+#   POW_PORT            = 8001
+#
+# Deploy order:
+#   1. Start TEE container with POW_CONTRACT_ADDRESS=0x000...000 (placeholder)
+#   2. GET /health → copy tee_wallet address
+#   3. Run: python3 deploy_token_tee.py --verifier <tee_wallet> --rpc <RPC_URL> --key <DEPLOYER_KEY>
+#   4. Update KMS: POW_CONTRACT_ADDRESS = <deployed contract address>
+#   5. Restart container
+
+CMD ["python3", "pow_server_tee.py"]
